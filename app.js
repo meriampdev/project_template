@@ -43,4 +43,24 @@ app.use(function(err, req, res, next) {
   res.render('error');
 });
 
+var http = require('http');
+var server = http.createServer();
+var socket_io = require('socket.io');
+server.listen(3001);
+var io = socket_io();
+io.attach(server);
+
+io.on('connection', function(socket){
+  console.log("Socket connected: " + socket.id);
+  socket.on('action', (action) => {
+    if (action.type === 'server/hello'){
+      io.emit('action', {type:'message', data: action.data});
+    }
+  });
+
+  socket.on('disconnect', function(data){
+    console.log('user disconnected', data);
+  });
+});
+
 module.exports = app;
